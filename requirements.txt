@@ -1,0 +1,14 @@
+fastapi>=0.111
+uvicorn[standard]>=0.30
+pydantic-settings>=2.2
+python-dotenv>=1.0
+gradio>=4.44
+pillow>=10.3
+numpy>=1.26
+
+# ML stack (install torch separately for your GPU/ROCm):
+# https://pytorch.org/get-started/locally/
+diffusers>=0.30
+transformers>=4.44
+accelerate>=0.33
+safetensors>=0.4

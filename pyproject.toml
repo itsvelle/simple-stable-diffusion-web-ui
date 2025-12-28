@@ -1,0 +1,9 @@
+[project]
+name = "simple-stable-diffusion-ui"
+version = "0.1.0"
+description = "FastAPI + Gradio SDXL UI (local models folder)"
+requires-python = ">=3.12"
+readme = "README.md"
+
+[tool.ruff]
+line-length = 100

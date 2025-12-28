@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+.venv/
+.env
+outputs/
+history.sqlite3
+outputs/history.sqlite3
+.DS_Store
+venv/
+**/*.safetensors
