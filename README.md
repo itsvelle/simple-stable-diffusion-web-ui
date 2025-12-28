@@ -1,6 +1,6 @@
-# SDUI (SDXL UI)
+# Simple Stable Diffusion UI
 
-A simple local web UI for SDXL image generation using **FastAPI + Gradio**.
+A simple local web UI for SD image generation using **FastAPI + Gradio**.
 
 - Python **3.12+**
 - Runs on Linux CPU, NVIDIA CUDA, and **AMD ROCm** (PyTorch ROCm)
@@ -65,7 +65,6 @@ Then open:
 
 ## Notes
 
-- If you add new model files while the server is running, restart to refresh dropdowns.
 - If you get out-of-memory errors, reduce resolution, steps, number of images, or use fewer LoRAs.
 
 ## Generation history (SQLite)
