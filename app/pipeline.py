@@ -211,9 +211,17 @@ def _maybe_build_long_prompt_kwargs(pipe: Any, prompt: str, negative_prompt: str
     pooled_prompt_embeds = pooled_2
     negative_pooled_prompt_embeds = neg_pooled_2
 
+    # Match pipeline dtype for numerical stability.
+    try:
+        target_dtype = getattr(getattr(pipe, "unet", None), "dtype", None) or prompt_embeds.dtype
+        prompt_embeds = prompt_embeds.to(dtype=target_dtype)
+        negative_prompt_embeds = negative_prompt_embeds.to(dtype=target_dtype)
+        pooled_prompt_embeds = pooled_prompt_embeds.to(dtype=target_dtype)
+        negative_pooled_prompt_embeds = negative_pooled_prompt_embeds.to(dtype=target_dtype)
+    except Exception:
+        pass
+
     return {
-        "prompt": None,
-        "negative_prompt": None,
         "prompt_embeds": prompt_embeds,
         "negative_prompt_embeds": negative_prompt_embeds,
         "pooled_prompt_embeds": pooled_prompt_embeds,
@@ -729,6 +737,9 @@ def generate(
         device=resolved_device,
     )
     if long_prompt_kwargs:
+        # Ensure diffusers does not try to tokenize text when embeddings are supplied.
+        base_kwargs.pop("prompt", None)
+        base_kwargs.pop("negative_prompt", None)
         base_kwargs.update(long_prompt_kwargs)
 
     images: list[Image.Image] = []
@@ -774,6 +785,8 @@ def generate(
                         generator=rgen,
                     )
                     if refiner_long_prompt_kwargs:
+                        ref_kwargs.pop("prompt", None)
+                        ref_kwargs.pop("negative_prompt", None)
                         ref_kwargs.update(refiner_long_prompt_kwargs)
                     r = refiner_pipe(**ref_kwargs)
                     refined.append(r.images[0])
