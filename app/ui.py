@@ -166,34 +166,44 @@ def build_ui() -> gr.Blocks:
             if not base_model:
                 raise gr.Error("No base model found. Put an SDXL model in models/base")
 
-            used_seed, images, saved, history_id = generate(
-                base_model=str(Path("base") / base_model),
-                prompt=prompt,
-                negative_prompt=negative,
-                width=int(width),
-                height=int(height),
-                steps=int(steps),
-                guidance_scale=float(cfg),
-                scheduler=scheduler,
-                prediction_type=prediction_type,
-                rescale_betas_zero_snr=bool(rescale_betas_zero_snr),
-                guidance_rescale=float(guidance_rescale),
-                seed=int(seed),
-                num_images=int(num_images),
-                enable_refiner=bool(enable_refiner),
-                refiner_model=(str(Path("refiner") / refiner_model) if (enable_refiner and refiner_model) else None),
-                refiner_strength=float(refiner_strength),
-                refiner_steps=int(refiner_steps),
-                vae=None if vae == "(none)" else str(Path("vae") / vae),
-                loras=[str(Path("lora") / x) for x in (loras or [])],
-                lora_scale=float(lora_scale),
-                device=device,
-                dtype=dtype,
-            )
+            try:
+                used_seed, _images, saved, history_id = generate(
+                    base_model=str(Path("base") / base_model),
+                    prompt=prompt,
+                    negative_prompt=negative,
+                    width=int(width),
+                    height=int(height),
+                    steps=int(steps),
+                    guidance_scale=float(cfg),
+                    scheduler=scheduler,
+                    prediction_type=prediction_type,
+                    rescale_betas_zero_snr=bool(rescale_betas_zero_snr),
+                    guidance_rescale=float(guidance_rescale),
+                    seed=int(seed),
+                    num_images=int(num_images),
+                    enable_refiner=bool(enable_refiner),
+                    refiner_model=(
+                        str(Path("refiner") / refiner_model)
+                        if (enable_refiner and refiner_model)
+                        else None
+                    ),
+                    refiner_strength=float(refiner_strength),
+                    refiner_steps=int(refiner_steps),
+                    vae=None if vae == "(none)" else str(Path("vae") / vae),
+                    loras=[str(Path("lora") / x) for x in (loras or [])],
+                    lora_scale=float(lora_scale),
+                    device=device,
+                    dtype=dtype,
+                    return_images=False,
+                )
+            except (RuntimeError, ValueError) as e:
+                raise gr.Error(str(e))
+
             files_list = "\n".join(saved)
             links = "\n".join([f"/outputs/{p}" for p in saved])
-            msg = f"Saved {len(saved)} image(s).\\n{links}"
-            return images, used_seed, history_id or 0, files_list, msg
+            msg = f"Saved {len(saved)} image(s).\n{links}"
+            gallery_items = [str((settings.outputs_dir / p).resolve()) for p in saved]
+            return gallery_items, used_seed, history_id or 0, files_list, msg
 
         def _history_choices(limit: int):
             items = list_generations(limit=int(limit))

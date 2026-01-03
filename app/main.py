@@ -86,6 +86,7 @@ def create_app() -> FastAPI:
             lora_scale=req.lora_scale,
             device=req.device or settings.default_device,
             dtype=req.dtype or settings.default_dtype,
+            return_images=False,
         )
         return GenerateResponse(
             history_id=history_id,

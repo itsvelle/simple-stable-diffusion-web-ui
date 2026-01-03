@@ -28,6 +28,8 @@ pip install -U pip
 pip install -r requirements.txt
 ```
 
+Note: LoRA loading requires the `peft` package (included in `requirements.txt`).
+
 ### PyTorch for AMD ROCm (Linux)
 
 Install a ROCm-enabled PyTorch build appropriate for your distro + ROCm version.
@@ -66,6 +68,14 @@ Then open:
 ## Notes
 
 - If you get out-of-memory errors, reduce resolution, steps, number of images, or use fewer LoRAs.
+- CLIP text encoders have a hard prompt-length limit (commonly 77 tokens). This app defaults to **chunking** long prompts so you don't lose trailing tags. You can control behavior with:
+  - `SDUI_LONG_PROMPT_MODE=chunk` (default)
+  - `SDUI_LONG_PROMPT_MODE=truncate` (drop tokens past the limit)
+  - `SDUI_LONG_PROMPT_MODE=error` (reject overly-long prompts)
+- If RAM/VRAM usage keeps creeping up after many generations, this app now defaults to cleaning up between runs (Python GC, and optional CUDA cache cleanup). You can control this via env vars:
+  - `SDUI_CLEANUP_AFTER_GENERATE=1` (default) / `0`
+  - `SDUI_EMPTY_CUDA_CACHE=1` (default `0`) — can help with long-running sessions at the cost of performance
+- The UI renders results from saved files in `outputs/` (instead of keeping PIL images in memory), which significantly reduces long-run RAM growth.
 
 ## Generation history (SQLite)
 

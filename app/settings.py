@@ -25,5 +25,22 @@ class Settings(BaseSettings):
     )
     default_dtype: str = Field(default="float16", description="float16|bfloat16|float32")
 
+    cleanup_after_generate: bool = Field(
+        default=True,
+        description="Run gc and (optionally) CUDA cache cleanup after each generation.",
+    )
+    empty_cuda_cache: bool = Field(
+        default=False,
+        description="If cleanup_after_generate is enabled and device is cuda, call torch.cuda.empty_cache().",
+    )
+
+    long_prompt_mode: str = Field(
+        default="chunk",
+        description=(
+            "How to handle prompts longer than CLIP's 77 token limit: "
+            "chunk|truncate|error. 'chunk' preserves the full prompt by splitting it into multiple chunks. "
+            "'truncate' drops tokens beyond the limit. 'error' rejects overly long prompts."
+        ),
+    )
 
 settings = Settings()
